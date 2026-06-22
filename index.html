@@ -338,13 +338,7 @@ improve.innerHTML=imp.length?imp.slice(0,10).map(x=>`<li>${x}</li>`).join(""):"<
 voice.innerHTML=data.map(x=>x[cols.like]).filter(Boolean).slice(0,8).map(x=>`<div class='quote'>${x}</div>`).join("");
 }
 
-const saved=localStorage.getItem("halan_dashboard");
-if(saved){
- render(JSON.parse(saved));
-}else{
- render(embeddedData);
- localStorage.setItem("halan_dashboard",JSON.stringify(embeddedData));
-}
+render(embeddedData);
 </script>
 </body>
 </html>
