@@ -1,0 +1,350 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تقرير متابعة المتدربين الجدد</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+body{margin:0;background:#f3f5f7;font-family:Segoe UI,Tahoma,sans-serif}
+.header{background:#00A86B;color:#fff;padding:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+.btn{background:#fff;color:#00A86B;border:none;padding:12px 18px;border-radius:12px;font-weight:bold;cursor:pointer}
+.wrap{padding:15px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+.card,.panel{background:#fff;border-radius:18px;padding:15px;box-shadow:0 4px 15px rgba(0,0,0,.08)}
+.kpi{font-size:28px;font-weight:700;color:#00A86B}
+.title{font-size:13px;color:#666}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:15px}
+.panel canvas{max-height:220px!important}
+.card-desc{font-size:11px;color:#8a8f98;margin-top:6px;line-height:1.5}
+.chart-desc{text-align:center;font-size:12px;color:#888;margin-top:10px}
+.quote{background:#f7f7f7;padding:10px;border-radius:10px;margin:8px 0}
+ul{margin:0}
+@media(max-width:768px){
+
+.grid2{
+grid-template-columns:1fr;
+}
+
+.cards{
+grid-template-columns:1fr;
+}
+
+.card{
+padding:18px;
+text-align:center;
+}
+
+.kpi{
+font-size:32px;
+line-height:1;
+}
+
+.card-desc{
+font-size:13px;
+}
+
+.btn{
+width:100%;
+margin-top:8px;
+}
+
+.wrap{
+padding:10px;
+}
+
+.panel canvas{
+max-height:180px !important;
+}
+
+.header{
+text-align:center;
+justify-content:center;
+}
+
+.header div:last-child{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+width:100%;
+}
+
+#govChart{
+max-height:220px !important;
+}
+
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+<div>
+<h2 style="margin:0">تقرير متابعة المتدربين الجدد</h2>
+<div>نتائج مكالمات قياس أثر التدريب</div>
+</div>
+<div>
+<input type="file" id="file" hidden accept=".csv">
+<button class="btn" onclick="file.click()">رفع ملف جديد</button> <button class="btn" onclick="window.print()">🖨️ طباعة التقرير التنفيذي</button>
+</div>
+</div>
+
+<div class="wrap">
+
+<div class="cards" id="cards"></div>
+
+<div class="panel" style="margin-top:15px">
+<h3>ملخص سريع</h3>
+<ul id="summary"></ul>
+</div>
+
+<div class="grid2">
+<div class="panel">
+<h3>مؤشرات التدريب</h3>
+<canvas id="scoreChart"></canvas><p class="chart-desc">يعرض متوسط تقييم المتدربين في أهم عناصر التدريب.</p>
+</div>
+
+<div class="panel">
+<h3>توزيع الردود حسب المحافظة</h3>
+<canvas id="govChart"></canvas><p class="chart-desc">يوضح توزيع الردود حسب المحافظات المشاركة.</p>
+</div>
+</div>
+
+
+<div class="grid2" style="margin-top:15px">
+<div class="panel">
+<h3>المحافظات الأعلى رضا</h3>
+<div id="bestGov">سيتم التحليل بعد رفع البيانات</div>
+</div>
+<div class="panel">
+<h3>المحافظات الأقل رضا والإجراءات المقترحة</h3>
+<div id="worstGov">سيتم التحليل بعد رفع البيانات</div>
+</div>
+</div>
+
+
+<div class="panel" style="margin-top:15px;background:#f8fffb;border:2px solid #00A86B">
+<h3>التقرير التنفيذي للإدارة</h3>
+<div id="execReport"></div>
+</div>
+
+<div class="grid2">
+<div class="panel">
+<h3>أهم الملاحظات والاستنتاجات</h3>
+<ul id="insights"></ul>
+</div>
+
+<div class="panel">
+<h3>نقاط محتاجة دعم إضافي</h3>
+<ul id="improve"></ul>
+</div>
+</div>
+
+<div class="panel" style="margin-top:15px">
+<h3>آراء المتدربين</h3>
+<div id="voice"></div>
+</div>
+
+</div>
+
+<script>
+let scoreChart,govChart;
+const embeddedData = [{"Id":"1","Start time":"6/22/2026 13:12","Completion time":"6/22/2026 13:17","Email":"mohamed.elbaroudy@halan.com","Name":"Mohamed Emad Emam Hassan","Who makes Call":"Mohamed Emad Emam Hassan Elbaroudy","Employer HR Code":"20082801","Employer Name":"Basant Mohamed Ahmed Abdo","City":"Alex","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"الشرح المفصل لجميع المنتجات","هل في موضوع أو جزء محتاج شرح أكتر؟":"لا يوجد"},{"Id":"2","Start time":"6/22/2026 13:17","Completion time":"6/22/2026 13:23","Email":"mohamed.elbaroudy@halan.com","Name":"Mohamed Emad Emam Hassan","Who makes Call":"Mohamed Emad Emam Hassan Elbaroudy","Employer HR Code":"20082803","Employer Name":"Shaymaa Ahmed Mahmoud Ahmed","City":"Alex","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"4","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"اعادة شرح المنتج اكتر من مرة","هل في موضوع أو جزء محتاج شرح أكتر؟":"الدراسة المالية"},{"Id":"3","Start time":"6/22/2026 13:23","Completion time":"6/22/2026 13:34","Email":"mohamed.elbaroudy@halan.com","Name":"Mohamed Emad Emam Hassan","Who makes Call":"Mohamed Emad Emam Hassan Elbaroudy","Employer HR Code":"20082804","Employer Name":"Mohamed Hamed Ebraheem Mohamed","City":"Behira","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"4","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"كان في مقدمة تمهيدية قبل الشغل بشكل عملي","هل في موضوع أو جزء محتاج شرح أكتر؟":"لا يوجد"},{"Id":"4","Start time":"6/22/2026 13:26","Completion time":"6/22/2026 13:34","Email":"Nader.baraka@halan.com","Name":"Nader Mohamed Abdallah Sherif","Who makes Call":"Nader Mohamed Abdallah Baraka","Employer HR Code":"50020630","Employer Name":"Zainab Khaled Sabre Fadel","City":"Qena","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"4","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"4","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"طبيعه الشغل و فهمنى اكتر و عرفنى الشركه","هل في موضوع أو جزء محتاج شرح أكتر؟":"لا مفيش"},{"Id":"5","Start time":"6/22/2026 13:34","Completion time":"6/22/2026 13:39","Email":"Nader.baraka@halan.com","Name":"Nader Mohamed Abdallah Sherif","Who makes Call":"Nader Mohamed Abdallah Baraka","Employer HR Code":"50020686","Employer Name":"Omnia Nasser Abdelmged Ezz Madboly","City":"Qalubia","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"فى الفرع اخدت تدريب بس التدريب ده مختلف فهمت منه اكتر و عرفت حلجلت انا مكنتش عارفاها","هل في موضوع أو جزء محتاج شرح أكتر؟":"لا مفيش"},{"Id":"6","Start time":"6/22/2026 13:34","Completion time":"6/22/2026 13:42","Email":"mohamed.elbaroudy@halan.com","Name":"Mohamed Emad Emam Hassan","Who makes Call":"Mohamed Emad Emam Hassan Elbaroudy","Employer HR Code":"20082807","Employer Name":"Shrouq Mostafa Mohamad Ahl","City":"Qalubia","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"4","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"المدرب كان بيشرح المعلومة اكتر من مرة","هل في موضوع أو جزء محتاج شرح أكتر؟":"لا يوجد"},{"Id":"7","Start time":"6/22/2026 13:42","Completion time":"6/22/2026 13:49","Email":"Nader.baraka@halan.com","Name":"Nader Mohamed Abdallah Sherif","Who makes Call":"Nader Mohamed Abdallah Baraka","Employer HR Code":"50020687","Employer Name":"Nada Yehia Mahmoud Afara","City":"Alex","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"المدرب كان محترم و خلقه واسع وفهمنى كل حاجه انا محتاجاها","هل في موضوع أو جزء محتاج شرح أكتر؟":"مفيش حاجه"},{"Id":"8","Start time":"6/22/2026 13:42","Completion time":"6/22/2026 13:50","Email":"mohamed.elbaroudy@halan.com","Name":"Mohamed Emad Emam Hassan","Who makes Call":"Mohamed Emad Emam Hassan Elbaroudy","Employer HR Code":"20082809","Employer Name":"Tasbeeh Hassani Abdulmajed Mohamed","City":"Luxor","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"4","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"التدريب كان مناسب","هل في موضوع أو جزء محتاج شرح أكتر؟":"لا يوجد"},{"Id":"9","Start time":"6/22/2026 13:51","Completion time":"6/22/2026 13:56","Email":"mohamed.elbaroudy@halan.com","Name":"Mohamed Emad Emam Hassan","Who makes Call":"Mohamed Emad Emam Hassan Elbaroudy","Employer HR Code":"20082811","Employer Name":"Amal Ashraf Moustafa Ebrahim","City":"Luxor","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"4","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"3","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"4","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"المدرب شرح المنتجات بشكل كافي","هل في موضوع أو جزء محتاج شرح أكتر؟":"كيفية التعامل مع العميل في تسويق المنتجات"},{"Id":"10","Start time":"6/22/2026 14:05","Completion time":"6/22/2026 14:09","Email":"Nader.baraka@halan.com","Name":"Nader Mohamed Abdallah Sherif","Who makes Call":"Nader Mohamed Abdallah Baraka","Employer HR Code":"50020689","Employer Name":"Aya Adel Fathi Khairy","City":"Qalubia","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"كله بصراحه فهم الشركه و انها كبيره و شغاله من زمان","هل في موضوع أو جزء محتاج شرح أكتر؟":"مفيش"},{"Id":"11","Start time":"6/22/2026 14:09","Completion time":"6/22/2026 14:11","Email":"Nader.baraka@halan.com","Name":"Nader Mohamed Abdallah Sherif","Who makes Call":"Nader Mohamed Abdallah Baraka","Employer HR Code":"50020692","Employer Name":"Rawan Ibrahim Aliwa Ibrahim","City":"Qalubia","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"انا سبت الشغل استقاله من يومين","هل في موضوع أو جزء محتاج شرح أكتر؟":"انا سبت الشغل استقاله من يومين"},{"Id":"12","Start time":"6/22/2026 14:11","Completion time":"6/22/2026 14:17","Email":"Nader.baraka@halan.com","Name":"Nader Mohamed Abdallah Sherif","Who makes Call":"Nader Mohamed Abdallah Baraka","Employer HR Code":"50020698","Employer Name":"Geges Aldeeb Riyad Gorgy","City":"Souhag","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"الاستهلاكى بشكل عام","هل في موضوع أو جزء محتاج شرح أكتر؟":"مفيش حاجه "},{"Id":"13","Start time":"6/22/2026 14:18","Completion time":"6/22/2026 14:23","Email":"Nader.baraka@halan.com","Name":"Nader Mohamed Abdallah Sherif","Who makes Call":"Nader Mohamed Abdallah Baraka","Employer HR Code":"50020699","Employer Name":"Abdalla Ashraf Ali Elsayed","City":"Souhag","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"4","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"التدريب كله انا مستفيد جدا","هل في موضوع أو جزء محتاج شرح أكتر؟":"مفيش تغيير"},{"Id":"14","Start time":"6/22/2026 14:24","Completion time":"6/22/2026 14:35","Email":"Nader.baraka@halan.com","Name":"Nader Mohamed Abdallah Sherif","Who makes Call":"Nader Mohamed Abdallah Baraka","Employer HR Code":"50020703","Employer Name":"Mona Ali Ahmed Mohamed","City":"Cairo","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"4","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"فهمت حاجات كتيير اكتر ","هل في موضوع أو جزء محتاج شرح أكتر؟":"مفيش حاجه"},{"Id":"15","Start time":"6/22/2026 14:20","Completion time":"6/22/2026 14:38","Email":"mohamed.elbaroudy@halan.com","Name":"Mohamed Emad Emam Hassan","Who makes Call":"Mohamed Emad Emam Hassan Elbaroudy","Employer HR Code":"20082824","Employer Name":"Nabil Nagy Shafik Boles","City":"Souhag","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"الشرح بالتفصيل","هل في موضوع أو جزء محتاج شرح أكتر؟":"لا يوجد - مشتغلش علي تحصيل الاقساط"},{"Id":"16","Start time":"6/22/2026 14:36","Completion time":"6/22/2026 14:38","Email":"Nader.baraka@halan.com","Name":"Nader Mohamed Abdallah Sherif","Who makes Call":"Nader Mohamed Abdallah Baraka","Employer HR Code":"50020705","Employer Name":"Azza Gamal Mohamed Abdelmanam","City":"Behira","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"الرقم غلط ","هل في موضوع أو جزء محتاج شرح أكتر؟":"الرقم غلط"},{"Id":"17","Start time":"6/22/2026 14:38","Completion time":"6/22/2026 14:42","Email":"Nader.baraka@halan.com","Name":"Nader Mohamed Abdallah Sherif","Who makes Call":"Nader Mohamed Abdallah Baraka","Employer HR Code":"50020706","Employer Name":"Mahmoud Sobhy Mahmoud Mohamed","City":"Giza","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"4","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"اسلوب التدريب مريح","هل في موضوع أو جزء محتاج شرح أكتر؟":"مفيش حاجه"},{"Id":"18","Start time":"6/22/2026 14:39","Completion time":"6/22/2026 14:46","Email":"mohamed.elbaroudy@halan.com","Name":"Mohamed Emad Emam Hassan","Who makes Call":"Mohamed Emad Emam Hassan Elbaroudy","Employer HR Code":"20082828","Employer Name":"Jailan Mustafa Ahmed Baioumy","City":"Behira","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"4","هل التدريب ساعدك تفهم طبيعة شغلك؟":"4","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"3","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"4","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"طريقة الشرح كانت مناسبة","هل في موضوع أو جزء محتاج شرح أكتر؟":"الاستثمار العقاري"},{"Id":"19","Start time":"6/22/2026 14:44","Completion time":"6/22/2026 14:47","Email":"Nader.baraka@halan.com","Name":"Nader Mohamed Abdallah Sherif","Who makes Call":"Nader Mohamed Abdallah Baraka","Employer HR Code":"50020724","Employer Name":"Hend Shokry Ramadan Elghamrwy","City":"Behira","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"كل حاجه واضحه و انه جاوب على كل الاسئله","هل في موضوع أو جزء محتاج شرح أكتر؟":"مفيش "},{"Id":"20","Start time":"6/22/2026 14:46","Completion time":"6/22/2026 15:18","Email":"mohamed.elbaroudy@halan.com","Name":"Mohamed Emad Emam Hassan","Who makes Call":"Mohamed Emad Emam Hassan Elbaroudy","Employer HR Code":"20082842","Employer Name":"Rabab Mohamed Mahmoud Mohamed","City":"Alex","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"4","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"4","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"شرح المنتجات بالتفصيل","هل في موضوع أو جزء محتاج شرح أكتر؟":"لا يوجد - لم تعمل علي تحصيل الاقساط"},{"Id":"21","Start time":"6/22/2026 15:18","Completion time":"6/22/2026 15:28","Email":"mohamed.elbaroudy@halan.com","Name":"Mohamed Emad Emam Hassan","Who makes Call":"Mohamed Emad Emam Hassan Elbaroudy","Employer HR Code":"20082844","Employer Name":"Hagr Ragab Abdallah Abobakr","City":"Marsa Matruh","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"4","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"لا يوجد","هل في موضوع أو جزء محتاج شرح أكتر؟":"لا يوجد - لم تعمل علي تحصيل الاقساط"},{"Id":"22","Start time":"6/22/2026 15:33","Completion time":"6/22/2026 15:37","Email":"Nader.baraka@halan.com","Name":"Nader Mohamed Abdallah Sherif","Who makes Call":"Nader Mohamed Abdallah Baraka","Employer HR Code":"50020725","Employer Name":"Maha Barkat Mahmoud Gaheen","City":"Giza","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"ازاى افهم العميل المنتجات و اكوده","هل في موضوع أو جزء محتاج شرح أكتر؟":"مفيش حاجه"},{"Id":"23","Start time":"6/22/2026 15:40","Completion time":"6/22/2026 15:47","Email":"Nader.baraka@halan.com","Name":"Nader Mohamed Abdallah Sherif","Who makes Call":"Nader Mohamed Abdallah Baraka","Employer HR Code":"50020743","Employer Name":"Ahmed Hussien Mosa Mohamed","City":"Giza","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"5","هل التدريب ساعدك تفهم طبيعة شغلك؟":"5","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"5","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"5","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"5","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"شرح كامل للمنتجات ","هل في موضوع أو جزء محتاج شرح أكتر؟":"عاوز انزل تدريب عملى معاهم عاوز اشوفهم بيحصلوا ازاى و بيعملوا ايه مع العملاء"},{"Id":"24","Start time":"6/22/2026 15:28","Completion time":"6/22/2026 15:53","Email":"mohamed.elbaroudy@halan.com","Name":"Mohamed Emad Emam Hassan","Who makes Call":"Mohamed Emad Emam Hassan Elbaroudy","Employer HR Code":"20082855","Employer Name":"Beshoy Gerges Saad Beshay","City":"Alex","بشكل عام، إيه رأيك في التدريب اللي أخدته؟":"4","هل التدريب ساعدك تفهم طبيعة شغلك؟":"4","بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟":"4","هل فهمت المنتجات والخدمات اللي الشركة بتقدمها؟":"نعم","هل التدريب عرفك معلومات كافية عن الشركة وطريقة الشغل فيها؟":"نعم","تقييمك للمدرب أو طريقة تقديم التدريب؟":"4","لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟":"4","هل تنصح أي موظف جديد يحضر نفس التدريب؟":"نعم","إيه أكتر حاجة عجبتك في التدريب؟":"المادة التدريبية كويسة","هل في موضوع أو جزء محتاج شرح أكتر؟":"لا يوجد - نزل تحصيل اقساط مرتين بتوجيه من مدير الفرع"}];
+const cols={
+overall:"بشكل عام، إيه رأيك في التدريب اللي أخدته؟",
+job:"هل التدريب ساعدك تفهم طبيعة شغلك؟",
+ready:"بعد التدريب، قد إيه حاسس إنك جاهز تبدأ شغلك؟",
+trainer:"تقييمك للمدرب أو طريقة تقديم التدريب؟",
+problem:"لو بدأت الشغل بكرة، هل تعرف تتصرف لو قابلتك مشكلة أو احتجت مساعدة؟",
+city:"City",
+like:"إيه أكتر حاجة عجبتك في التدريب؟",
+improve:"هل في موضوع أو جزء محتاج شرح أكتر؟"
+};
+
+file.addEventListener("change",e=>{
+Papa.parse(e.target.files[0],{
+header:true,
+complete:r=>{
+localStorage.setItem("halan_dashboard",JSON.stringify(r.data));
+render(r.data);
+}
+});
+});
+
+function avg(data,col){
+let v=data.map(x=>Number(x[col])).filter(x=>!isNaN(x));
+if(!v.length)return 0;
+return v.reduce((a,b)=>a+b,0)/v.length;
+}
+
+function pct(v){return Math.round(v*20)}
+
+function render(data){
+
+data=data.filter(x=>Object.keys(x).length>1);
+
+const overall=avg(data,cols.overall);
+const job=avg(data,cols.job);
+const ready=avg(data,cols.ready);
+const trainer=avg(data,cols.trainer);
+const problem=avg(data,cols.problem);
+
+const health=Math.round((overall+job+ready+trainer+problem)/5*20);
+
+cards.innerHTML=`
+<div class="card"><div class="title">عدد الردود</div><div class="kpi">${data.length}</div><div class="card-desc">إجمالي عدد المكالمات التي تم تحليلها</div></div>
+<div class="card"><div class="title">الرضا عن التدريب</div><div class="kpi">${pct(overall)}%</div><div class="card-desc">متوسط تقييم المتدربين للتدريب</div></div>
+<div class="card"><div class="title">فهم طبيعة الشغل</div><div class="kpi">${pct(job)}%</div><div class="card-desc">مدى فهم المتدربين لمهامهم الوظيفية</div></div>
+<div class="card"><div class="title">الجاهزية للعمل</div><div class="kpi">${pct(ready)}%</div><div class="card-desc">مدى استعداد المتدرب لبدء العمل</div></div>
+<div class="card"><div class="title">تقييم المدرب</div><div class="kpi">${pct(trainer)}%</div><div class="card-desc">متوسط تقييم أسلوب الشرح والتقديم</div></div>
+<div class="card"><div class="title">مؤشر نجاح التدريب</div><div class="kpi">${health}</div><div class="card-desc">مؤشر مجمع يعكس جودة التدريب</div></div>
+`;
+
+summary.innerHTML=`
+<li>${pct(overall)}% من المتدربين راضين عن التدريب.</li>
+<li>${pct(job)}% أكدوا فهمهم لطبيعة العمل.</li>
+<li>${pct(trainer)}% تقييم إيجابي للمدربين.</li>
+<li>مؤشر نجاح التدريب الحالي ${health} من 100.</li>
+`;
+
+if(scoreChart)scoreChart.destroy();
+scoreChart=new Chart(scoreChart=document.getElementById("scoreChart"),{
+type:"bar",
+data:{
+labels:["الرضا","فهم الشغل","الجاهزية","المدرب","حل المشكلات"],
+datasets:[{
+data:[pct(overall),pct(job),pct(ready),pct(trainer),pct(problem)],
+backgroundColor:"#00A86B"
+}]
+},
+plugins:[ChartDataLabels],options:{plugins:{legend:{display:false},datalabels:{anchor:'center',align:'center',color:'#fff',font:{weight:'bold',size:12},formatter:(v)=>v+'%'}}}
+});
+
+const gov={};
+data.forEach(r=>{
+let c=r[cols.city]||"غير محدد";
+gov[c]=(gov[c]||0)+1;
+});
+
+if(govChart)govChart.destroy();
+govChart=new Chart(document.getElementById("govChart"),{
+    type:"doughnut",
+
+    data:{
+        labels:Object.keys(gov),
+        datasets:[{
+            data:Object.values(gov)
+        }]
+    },
+
+    plugins:[ChartDataLabels],
+
+    options:{
+        plugins:{
+
+            legend:{
+                position:'bottom'
+            },
+
+            tooltip:{
+                callbacks:{
+                    label:(ctx)=>{
+                        const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+                        const percent = ((ctx.raw/total)*100).toFixed(1);
+
+                        return `${ctx.label}: ${ctx.raw} رد (${percent}%)`;
+                    }
+                }
+            },
+
+            datalabels:{
+                color:'#fff',
+
+                font:{
+                    weight:'bold',
+                    size:12
+                },
+
+                formatter:(value)=>{
+                    return value;
+                }
+            }
+        }
+    }
+});
+
+
+const govScores={};
+data.forEach(r=>{
+ let c=r[cols.city]||'غير محدد';
+ let s=Number(r[cols.overall])||0;
+ if(!govScores[c]) govScores[c]=[];
+ govScores[c].push(s);
+});
+
+const govAvg=Object.entries(govScores).map(([k,v])=>({
+ city:k,
+ score:Math.round((v.reduce((a,b)=>a+b,0)/v.length)*20)
+})).sort((a,b)=>b.score-a.score);
+
+bestGov.innerHTML=govAvg.slice(0,3).map(g=>
+ `<div style="padding:8px;border-bottom:1px solid #eee"><b>${g.city}</b> - ${g.score}% رضا</div>`
+).join('');
+
+const lowGov = govAvg.filter(g => g.score < 90);
+
+if(lowGov.length){
+    worstGov.innerHTML = lowGov.map(g =>
+    `<div style="padding:8px;border-bottom:1px solid #eee">
+        <b>${g.city}</b> - ${g.score}% رضا
+        <br>
+        <span style="color:#666">
+        الإجراء: متابعة إضافية وتدريب عملي أكثر.
+        </span>
+    </div>`
+    ).join('');
+}
+else{
+    worstGov.innerHTML = `
+    <div style="padding:12px;color:#00A86B;font-weight:bold">
+        لا توجد محافظات أقل من 90% رضا 🎉
+    </div>`;
+}
+
+
+execReport.innerHTML=`
+<b>مؤشر نجاح التدريب:</b> ${health}/100<br>
+<b>الرضا العام:</b> ${pct(overall)}%<br>
+<b>فهم طبيعة العمل:</b> ${pct(job)}%<br>
+<b>الجاهزية للعمل:</b> ${pct(ready)}%<br>
+<b>أفضل محافظة:</b> ${govAvg[0]?.city||'-'} (${govAvg[0]?.score||0}%)<br>
+<b>إجمالي الردود:</b> ${data.length}<br><br>
+<b>التوصية:</b> الاستمرار في المنهج الحالي مع التركيز على المحافظات الأقل من 90% رضا.
+`;
+
+insights.innerHTML=`
+<li>مستوى الرضا العام عن التدريب مرتفع.</li>
+<li>المدرب من أعلى العناصر تقييمًا.</li>
+<li>معظم المتدربين يشعرون بالجاهزية للعمل.</li>
+<li>لا توجد فجوات كبيرة في نتائج التدريب الحالية.</li>
+`;
+
+let imp=data.map(x=>x[cols.improve]).filter(x=>x && !x.includes("لا"));
+improve.innerHTML=imp.length?imp.slice(0,10).map(x=>`<li>${x}</li>`).join(""):"<li>لا توجد ملاحظات متكررة حاليًا.</li>";
+
+voice.innerHTML=data.map(x=>x[cols.like]).filter(Boolean).slice(0,8).map(x=>`<div class='quote'>${x}</div>`).join("");
+}
+
+const saved=localStorage.getItem("halan_dashboard");
+if(saved){
+ render(JSON.parse(saved));
+}else{
+ render(embeddedData);
+ localStorage.setItem("halan_dashboard",JSON.stringify(embeddedData));
+}
+</script>
+</body>
+</html>
