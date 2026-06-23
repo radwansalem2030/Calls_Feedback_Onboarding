@@ -22,7 +22,32 @@ body{margin:0;background:#f3f5f7;font-family:Segoe UI,Tahoma,sans-serif}
 .card-desc{font-size:11px;color:#8a8f98;margin-top:6px;line-height:1.5}
 .chart-desc{text-align:center;font-size:12px;color:#888;margin-top:10px}
 .quote{background:#f7f7f7;padding:10px;border-radius:10px;margin:8px 0}
-ul{margin:0}
+ul{
+list-style:none;
+padding:0;
+margin:0;
+display:flex;
+flex-direction:column;
+gap:10px;
+}
+
+ul li{
+background:#efefef;
+padding:14px 24px;
+border-radius:14px;
+font-size:15px;
+font-weight:500;
+line-height:1.8;
+border:none;
+box-shadow:none;
+color:#222;
+}
+
+ul li:hover{
+background:#efefef;
+transform:none;
+}
+
 @media(max-width:768px){
 
 .grid2{
@@ -77,6 +102,49 @@ max-height:220px !important;
 }
 
 }
+.followup-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+gap:15px;
+margin-top:15px;
+}
+
+.followup-card{
+background:#fff7f7;
+border:1px solid #ffdede;
+border-radius:18px;
+padding:18px;
+}
+
+.followup-name{
+font-size:16px;
+font-weight:700;
+color:#222;
+margin-bottom:8px;
+}
+
+.followup-branch{
+display:inline-block;
+background:#ffeaea;
+color:#c0392b;
+padding:6px 12px;
+border-radius:20px;
+font-size:13px;
+font-weight:600;
+margin-bottom:12px;
+}
+
+.followup-reason{
+font-size:14px;
+line-height:1.9;
+color:#555;
+}
+
+@media(max-width:768px){
+.followup-grid{
+grid-template-columns:1fr;
+}
+}
 </style>
 </head>
 <body>
@@ -88,7 +156,6 @@ max-height:220px !important;
 </div>
 <div>
 <input type="file" id="file" hidden accept=".csv">
-<button class="btn" onclick="file.click()">رفع ملف جديد</button> <button class="btn" onclick="window.print()">🖨️ طباعة التقرير التنفيذي</button>
 </div>
 </div>
 
@@ -126,26 +193,71 @@ max-height:220px !important;
 </div>
 
 
-<div class="panel" style="margin-top:15px;background:#f8fffb;border:2px solid #00A86B">
-<h3>التقرير التنفيذي للإدارة</h3>
-<div id="execReport"></div>
-</div>
+
 
 <div class="grid2">
 <div class="panel">
-<h3>أهم الملاحظات والاستنتاجات</h3>
-<ul id="insights"></ul>
+<h3>إيه أكتر حاجة كانت مفيدة ليك في التدريب</h3>
+<ul id="likesList"></ul>
 </div>
 
 <div class="panel">
-<h3>نقاط محتاجة دعم إضافي</h3>
-<ul id="improve"></ul>
+<h3>تقترح إيه عشان البرنامج التدريبي يكون أفضل</h3>
+<ul id="suggestionsList"></ul>
 </div>
 </div>
 
 <div class="panel" style="margin-top:15px">
-<h3>آراء المتدربين</h3>
-<div id="voice"></div>
+<h3>أهم الملاحظات</h3>
+<ul id="insights"></ul>
+</div>
+
+<div class="panel" style="margin-top:15px">
+<h3>حالات تستدعي المتابعة</h3>
+
+<div class="followup-grid">
+
+<div class="followup-card">
+<div class="followup-name">Amal Ashraf Moustafa Ebrahim</div>
+<div class="followup-branch">الأقصر – الزينية بحري – تساهيل</div>
+<div class="followup-reason">
+قامت بالنزول مرتين في مهام تحصيل الأقساط برفقة رئيس المجموعة لمتابعة التحصيل والعملاء المتأخرين في السداد
+</div>
+</div>
+
+<div class="followup-card">
+<div class="followup-name">Shaymaa Ahmed Mahmoud Ahmed</div>
+<div class="followup-branch">الإسكندرية – البيطاش – تساهيل</div>
+<div class="followup-reason">
+مكلفة بإجراء مكالمات هاتفية للعملاء بغرض متابعة وتحصيل الأقساط المستحقة بالفرع
+</div>
+</div>
+
+<div class="followup-card">
+<div class="followup-name">Beshoy Gerges Saad Beshay</div>
+<div class="followup-branch">الإسكندرية – البيطاش – تساهيل</div>
+<div class="followup-reason">
+قام بالنزول في مهام تحصيل الأقساط برفقة رئيس المجموعة لمتابعة التحصيل والعملاء المتأخرين في السداد
+</div>
+</div>
+
+<div class="followup-card">
+<div class="followup-name">Feryal Elsayed Elshahat Elsayed</div>
+<div class="followup-branch">كفر الشيخ – سريوة الكبرى – تساهيل</div>
+<div class="followup-reason">
+قامت بالنزول في مهام تحصيل الأقساط برفقة رئيس المجموعة لمتابعة التحصيل والعملاء المتأخرين في السداد
+</div>
+</div>
+
+<div class="followup-card">
+<div class="followup-name">Mohamed Elsafi Mohamed Mohamed Shehata</div>
+<div class="followup-branch">البحيرة – قافلة – تساهيل</div>
+<div class="followup-reason">
+شارك في مهام التحصيل الميداني مع رئيس المجموعة لمتابعة العملاء المتأخرين في السداد ودعم خطة التحصيل الخاصة بالفرع
+</div>
+</div>
+
+</div>
 </div>
 
 </div>
@@ -182,6 +294,10 @@ return v.reduce((a,b)=>a+b,0)/v.length;
 
 function pct(v){return Math.round(v*20)}
 
+function positiveCount(data,col){
+return data.filter(x=>Number(x[col])>=4).length;
+}
+
 function render(data){
 
 data=data.filter(x=>Object.keys(x).length>1);
@@ -194,29 +310,53 @@ const problem=avg(data,cols.problem);
 
 const health=Math.round((overall+job+ready+trainer+problem)/5*20);
 
+const overallCount=positiveCount(data,cols.overall);
+const jobCount=positiveCount(data,cols.job);
+const readyCount=positiveCount(data,cols.ready);
+const trainerCount=positiveCount(data,cols.trainer);
+
 cards.innerHTML=`
-<div class="card"><div class="title">عدد الردود</div><div class="kpi">${data.length}</div><div class="card-desc">إجمالي عدد المكالمات التي تم تحليلها</div></div>
-<div class="card"><div class="title">الرضا عن التدريب</div><div class="kpi">${pct(overall)}%</div><div class="card-desc">متوسط تقييم المتدربين للتدريب</div></div>
-<div class="card"><div class="title">فهم طبيعة الشغل</div><div class="kpi">${pct(job)}%</div><div class="card-desc">مدى فهم المتدربين لمهامهم الوظيفية</div></div>
-<div class="card"><div class="title">الجاهزية للعمل</div><div class="kpi">${pct(ready)}%</div><div class="card-desc">مدى استعداد المتدرب لبدء العمل</div></div>
-<div class="card"><div class="title">تقييم المدرب</div><div class="kpi">${pct(trainer)}%</div><div class="card-desc">متوسط تقييم أسلوب الشرح والتقديم</div></div>
-<div class="card"><div class="title">مؤشر نجاح التدريب</div><div class="kpi">${health}</div><div class="card-desc">مؤشر مجمع يعكس جودة التدريب</div></div>
+<div class="card"><div class="title">عدد المكالمات</div><div class="kpi">60</div><div class="card-desc">تم الرد ${data.length}</div></div>
+
+<div class="card">
+<div class="title">الرضا عن التدريب</div>
+<div class="kpi">${pct(overall)}%</div>
+<div class="card-desc">${overallCount} من ${data.length} رد</div>
+</div>
+
+<div class="card">
+<div class="title">فهم طبيعة الشغل</div>
+<div class="kpi">${pct(job)}%</div>
+<div class="card-desc">${jobCount} من ${data.length} رد</div>
+</div>
+
+<div class="card">
+<div class="title">الجاهزية للعمل</div>
+<div class="kpi">${pct(ready)}%</div>
+<div class="card-desc">${readyCount} من ${data.length} رد</div>
+</div>
+
+<div class="card">
+<div class="title">تقييم المدرب</div>
+<div class="kpi">${pct(trainer)}%</div>
+<div class="card-desc">${trainerCount} من ${data.length} رد</div>
+</div>
 `;
 
 summary.innerHTML=`
-<li>${pct(overall)}% من المتدربين راضين عن التدريب.</li>
-<li>${pct(job)}% أكدوا فهمهم لطبيعة العمل.</li>
-<li>${pct(trainer)}% تقييم إيجابي للمدربين.</li>
-<li>مؤشر نجاح التدريب الحالي ${health} من 100.</li>
+<li>عدد المكالمات 60</li>
+<li>${pct(overall)}% من المتدربين راضين عن التدريب</li>
+<li>${pct(job)}% أكدوا فهمهم لطبيعة العمل</li>
+<li>${pct(trainer)}% تقييم إيجابي للمدربين</li>
 `;
 
 if(scoreChart)scoreChart.destroy();
 scoreChart=new Chart(scoreChart=document.getElementById("scoreChart"),{
 type:"bar",
 data:{
-labels:["الرضا","فهم الشغل","الجاهزية","المدرب","حل المشكلات"],
+labels:["الرضا عن التدريب","فهم الشغل","الجاهزية للشغل","رأيك في القائم بالتدريب"],
 datasets:[{
-data:[pct(overall),pct(job),pct(ready),pct(trainer),pct(problem)],
+data:[pct(overall),pct(job),pct(ready),pct(trainer)],
 backgroundColor:"#00A86B"
 }]
 },
@@ -315,27 +455,43 @@ else{
 }
 
 
-execReport.innerHTML=`
-<b>مؤشر نجاح التدريب:</b> ${health}/100<br>
-<b>الرضا العام:</b> ${pct(overall)}%<br>
-<b>فهم طبيعة العمل:</b> ${pct(job)}%<br>
-<b>الجاهزية للعمل:</b> ${pct(ready)}%<br>
-<b>أفضل محافظة:</b> ${govAvg[0]?.city||'-'} (${govAvg[0]?.score||0}%)<br>
-<b>إجمالي الردود:</b> ${data.length}<br><br>
-<b>التوصية:</b> الاستمرار في المنهج الحالي مع التركيز على المحافظات الأقل من 90% رضا.
+likesList.innerHTML=`
+<li>فهمت المنتجات بشكل أوضح وأعمق</li>
+<li>الشرح كان بسيط وسهل الفهم</li>
+<li>إعادة شرح المعلومات ساعدتني على استيعاب المحتوى بشكل أفضل</li>
+<li>عرفت تفاصيل أكتر عن طبيعة الشغل ودوري الوظيفي</li>
+<li>اتعرفت على الشركة ومنتجاتها بشكل أفضل</li>
+<li>التدريب وضح لي خطوات العمل بشكل عملي</li>
+<li>عرفت أشرح المنتجات للعميل بطريقة أسهل</li>
+<li>لقيت إجابات على أسئلة ونقاط كانت غير واضحة بالنسبة لي</li>
+<li>فهمت منتجات مثل الجمعية والتحويش والاستثمار بشكل أفضل</li>
+<li>التدريب ساعدني أفهم جوانب ما كنتش مدركها بشكل كامل من قبل</li>
+`;
+
+suggestionsList.innerHTML=`
+<li>الحاجة إلى شرح أكثر للدراسة المالية</li>
+<li>الحاجة إلى شرح أعمق لمنتج الاستثمار العقاري</li>
+<li>الرغبة في فهم أفضل لكيفية التعامل مع العملاء وتسويق المنتجات</li>
+<li>طلب تدريب عملي (Shadowing) لمتابعة آلية التعامل مع العملاء على أرض الواقع</li>
+<li>الحاجة إلى التعرف بشكل أكبر على إجراءات تحصيل الأقساط</li>
+<li>طلب شرح إضافي لمنتج تمويل السيارات</li>
 `;
 
 insights.innerHTML=`
-<li>مستوى الرضا العام عن التدريب مرتفع.</li>
-<li>المدرب من أعلى العناصر تقييمًا.</li>
-<li>معظم المتدربين يشعرون بالجاهزية للعمل.</li>
-<li>لا توجد فجوات كبيرة في نتائج التدريب الحالية.</li>
+<li>أغلب المتدربين أكدوا أن محتوى التدريب كان واضحًا ولا توجد موضوعات إضافية يحتاجون شرحها</li>
+<li>أكثر نقطة طلب المتدربون التوسع فيها كانت الدراسة المالية وآلية تقييم العملاء</li>
+<li>ظهرت رغبة لدى بعض المتدربين في زيادة التدريب العملي والمصاحبة الميدانية (Shadowing)</li>
+<li>عدد من المتدربين لم تتوفر لهم فرصة كافية للتعرف على إجراءات تحصيل الأقساط بشكل عملي</li>
+<li>المنتجات الأكثر ذكرًا ضمن الاحتياجات الإضافية كانت الاستثمار العقاري وتمويل السيارات</li>
+<li>المتدربون أشاروا إلى أن شرح المنتجات ساعدهم على فهم طبيعة العمل بشكل أفضل</li>
+<li>الردود أظهرت تفاوتًا في الخبرات العملية السابقة؛ حيث إن بعض المتدربين سبق لهم النزول الميداني بينما لم تتح الفرصة للبعض الآخر</li>
+<li>التركيز على التطبيق العملي داخل الفروع قد يساهم في تعزيز الاستفادة من التدريب الحالي</li>
 `;
 
-let imp=data.map(x=>x[cols.improve]).filter(x=>x && !x.includes("لا"));
-improve.innerHTML=imp.length?imp.slice(0,10).map(x=>`<li>${x}</li>`).join(""):"<li>لا توجد ملاحظات متكررة حاليًا.</li>";
-
-voice.innerHTML=data.map(x=>x[cols.like]).filter(Boolean).slice(0,8).map(x=>`<div class='quote'>${x}</div>`).join("");
+redFlags.innerHTML=`
+<li>يوجد عدد 2 أخصائيين نزلوا تحصيل</li>
+<li>عدد 1 بيتابع الأقساط وتحصيلها بالتليفون مع العملاء</li>
+`;
 }
 
 render(embeddedData);
