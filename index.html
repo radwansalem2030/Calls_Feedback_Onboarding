@@ -1,13 +1,12 @@
-
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
+<!-- saved from url=(0083)file:///C:/Users/radwan.mohamed/Downloads/Final_Calls_Report_Final_With_Counts.html -->
+<html lang="ar" dir="rtl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>تقرير متابعة المتدربين الجدد</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="./تقرير متابعة المتدربين الجدد_files/chart.js.download"></script>
+<script src="./تقرير متابعة المتدربين الجدد_files/chartjs-plugin-datalabels@2"></script>
+<script src="./تقرير متابعة المتدربين الجدد_files/papaparse.min.js.download"></script>
 <style>
 body{margin:0;background:#f3f5f7;font-family:Segoe UI,Tahoma,sans-serif}
 .header{background:#00A86B;color:#fff;padding:18px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
@@ -155,18 +154,45 @@ grid-template-columns:1fr;
 <div>نتائج مكالمات قياس أثر التدريب</div>
 </div>
 <div>
-<input type="file" id="file" hidden accept=".csv">
+<input type="file" id="file" hidden="" accept=".csv">
 </div>
 </div>
 
 <div class="wrap">
 
-<div class="cards" id="cards"></div>
+<div class="cards" id="cards">
+<div class="card"><div class="title">عدد المكالمات</div><div class="kpi">38/60</div><div class="card-desc">عدد الردود من إجمالي المكالمات</div></div>
 
-<div class="grid2">
-<div class="panel">
+<div class="card">
+<div class="title">الرضا عن التدريب</div>
+<div class="kpi">96%</div>
+<div class="card-desc">37 من 38 رد</div>
+</div>
+
+<div class="card">
+<div class="title">فهم طبيعة الشغل</div>
+<div class="kpi">96%</div>
+<div class="card-desc">37 من 38 رد</div>
+</div>
+
+<div class="card">
+<div class="title">الجاهزية للعمل</div>
+<div class="kpi">94%</div>
+<div class="card-desc">35 من 38 رد</div>
+</div>
+
+<div class="card">
+<div class="title">تقييم المدرب</div>
+<div class="kpi">97%</div>
+<div class="card-desc">37 من 38 رد</div>
+</div>
+</div>
+
+
+<div style="margin-top:15px">
+<div class="panel" style="max-width:1200px;margin:auto;">
 <h3>توزيع الردود حسب المحافظة</h3>
-<canvas id="govChart"></canvas><p class="chart-desc">يوضح توزيع الردود حسب المحافظات المشاركة.</p>
+<div style="height:450px"><canvas id="govChart" width="879" height="275" style="display: block; box-sizing: border-box; height: 220px; width: 703.9px;"></canvas></div><p class="chart-desc">يوضح توزيع الردود حسب المحافظات المشاركة.</p>
 </div>
 </div>
 
@@ -174,11 +200,23 @@ grid-template-columns:1fr;
 <div class="grid2" style="margin-top:15px">
 <div class="panel">
 <h3>المحافظات الأعلى رضا</h3>
-<div id="bestGov">سيتم التحليل بعد رفع البيانات</div>
+<div id="bestGov"><div style="padding:8px;border-bottom:1px solid #eee"><b>Qena</b> - 100% رضا</div><div style="padding:8px;border-bottom:1px solid #eee"><b>Qalubia</b> - 100% رضا</div><div style="padding:8px;border-bottom:1px solid #eee"><b>Luxor</b> - 100% رضا</div></div>
 </div>
 <div class="panel">
 <h3>المحافظات الأقل رضا والإجراءات المقترحة</h3>
-<div id="worstGov">سيتم التحليل بعد رفع البيانات</div>
+<div id="worstGov"><div style="padding:8px;border-bottom:1px solid #eee">
+        <b>Cairo</b> - 87% رضا
+        <br>
+        <span style="color:#666">
+        الإجراء: متابعة إضافية وتدريب عملي أكثر.
+        </span>
+    </div><div style="padding:8px;border-bottom:1px solid #eee">
+        <b>Fayoum</b> - 80% رضا
+        <br>
+        <span style="color:#666">
+        الإجراء: متابعة إضافية وتدريب عملي أكثر.
+        </span>
+    </div></div>
 </div>
 </div>
 
@@ -188,18 +226,44 @@ grid-template-columns:1fr;
 <div class="grid2">
 <div class="panel">
 <h3>إيه أكتر حاجة كانت مفيدة ليك في التدريب</h3>
-<ul id="likesList"></ul>
+<ul id="likesList">
+<li>فهمت المنتجات بشكل أوضح وأعمق</li>
+<li>الشرح كان بسيط وسهل الفهم</li>
+<li>إعادة شرح المعلومات ساعدتني على استيعاب المحتوى بشكل أفضل</li>
+<li>عرفت تفاصيل أكتر عن طبيعة الشغل ودوري الوظيفي</li>
+<li>اتعرفت على الشركة ومنتجاتها بشكل أفضل</li>
+<li>التدريب وضح لي خطوات العمل بشكل عملي</li>
+<li>عرفت أشرح المنتجات للعميل بطريقة أسهل</li>
+<li>لقيت إجابات على أسئلة ونقاط كانت غير واضحة بالنسبة لي</li>
+<li>فهمت منتجات مثل الجمعية والتحويش والاستثمار بشكل أفضل</li>
+<li>التدريب ساعدني أفهم جوانب ما كنتش مدركها بشكل كامل من قبل</li>
+</ul>
 </div>
 
 <div class="panel">
 <h3>تقترح إيه عشان البرنامج التدريبي يكون أفضل</h3>
-<ul id="suggestionsList"></ul>
+<ul id="suggestionsList">
+<li>الحاجة إلى شرح أكثر للدراسة المالية</li>
+<li>الحاجة إلى شرح أعمق لمنتج الاستثمار العقاري</li>
+<li>الرغبة في فهم أفضل لكيفية التعامل مع العملاء وتسويق المنتجات</li>
+<li>طلب تدريب عملي (Shadowing) لمتابعة آلية التعامل مع العملاء على أرض الواقع</li>
+<li>الحاجة إلى التعرف بشكل أكبر على إجراءات تحصيل الأقساط</li>
+<li>طلب شرح إضافي لمنتج تمويل السيارات</li>
+</ul>
 </div>
 </div>
 
 <div class="panel" style="margin-top:15px">
 <h3>أهم الملاحظات</h3>
-<ul id="insights"></ul>
+<ul id="insights">
+<li>أغلب المتدربين أكدوا أن محتوى التدريب كان واضحًا ولا توجد موضوعات إضافية يحتاجون شرحها</li>
+<li>أكثر نقطة طلب المتدربون التوسع فيها كانت الدراسة المالية وآلية تقييم العملاء</li>
+<li>ظهرت رغبة لدى بعض المتدربين في زيادة التدريب العملي والمصاحبة الميدانية (Shadowing)</li>
+<li>عدد من المتدربين لم تتوفر لهم فرصة كافية للتعرف على إجراءات تحصيل الأقساط بشكل عملي</li>
+<li>المنتجات الأكثر ذكرًا ضمن الاحتياجات الإضافية كانت الاستثمار العقاري وتمويل السيارات</li>
+<li>المتدربون أشاروا إلى أن شرح المنتجات ساعدهم على فهم طبيعة العمل بشكل أفضل</li>
+<li>التركيز على التطبيق العملي داخل الفروع قد يساهم في تعزيز الاستفادة من التدريب الحالي</li>
+</ul>
 </div>
 
 <div class="panel" style="margin-top:15px">
@@ -306,7 +370,7 @@ const readyCount=positiveCount(data,cols.ready);
 const trainerCount=positiveCount(data,cols.trainer);
 
 cards.innerHTML=`
-<div class="card"><div class="title">عدد المكالمات</div><div class="kpi">60</div><div class="card-desc">تم الرد ${data.length}</div></div>
+<div class="card"><div class="title">عدد المكالمات والردود</div><div class="kpi">${data.length}/60</div><div class="card-desc">عدد الردود من إجمالي المكالمات</div></div>
 
 <div class="card">
 <div class="title">الرضا عن التدريب</div>
@@ -331,13 +395,6 @@ cards.innerHTML=`
 <div class="kpi">${pct(trainer)}%</div>
 <div class="card-desc">${trainerCount} من ${data.length} رد</div>
 </div>
-`;
-
-summary.innerHTML=`
-<li>عدد المكالمات 60</li>
-<li>${pct(overall)}% من المتدربين راضين عن التدريب</li>
-<li>${pct(job)}% أكدوا فهمهم لطبيعة العمل</li>
-<li>${pct(trainer)}% تقييم إيجابي للمدربين</li>
 `;
 
 if(scoreChart)scoreChart.destroy();
@@ -373,6 +430,8 @@ govChart=new Chart(document.getElementById("govChart"),{
     plugins:[ChartDataLabels],
 
     options:{
+        responsive:true,
+        maintainAspectRatio:false,
         plugins:{
 
             legend:{
@@ -477,13 +536,9 @@ insights.innerHTML=`
 <li>التركيز على التطبيق العملي داخل الفروع قد يساهم في تعزيز الاستفادة من التدريب الحالي</li>
 `;
 
-redFlags.innerHTML=`
-<li>يوجد عدد 2 أخصائيين نزلوا تحصيل</li>
-<li>عدد 1 بيتابع الأقساط وتحصيلها بالتليفون مع العملاء</li>
-`;
 }
 
 render(embeddedData);
 </script>
-</body>
-</html>
+
+</body></html>
